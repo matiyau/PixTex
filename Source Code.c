@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 	else
 	{
 		filename="sample.bmp";
-		printf("Too Many Arguments. Switching To Default File Name \"sample.bmp\"");
+		printf("Too Many Arguments. Switching To Default File Name \"sample.bmp\"\n\n");
 	}	
 	char opt;
 	start:
