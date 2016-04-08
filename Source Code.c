@@ -74,18 +74,41 @@ void write_pix(char ch)
 	return;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+	char *filename;
+	if (argc==1)
+	{
+		filename="sample.bmp";
+	}
+	else if (argc==2)
+	{
+		filename=argv[0];
+	}
+	else
+	{
+		filename="sample.bmp";
+		printf("Too Many Arguments. Switching To Default File Name \"sample.bmp\"");
+	}	
 	char opt;
 	start:
-	printf("Enter 1 To Read The Message.\nEnter 2 To Write A Message.\nEnter 3 To Reset The Bitmap.\nEnter 0 To Exit.\n");
+	printf("The Current Image File Is \"%s\"\n", filename);
+	printf("Enter 1 To Read The Message.\nEnter 2 To Write A Message.\nEnter 3 To Reset The Bitmap.\nEnter 4 To Change The Image File.\nEnter 0 To Exit.\n");
 	scanf("%c", &opt);
 	getchar();
 	if (opt==48)
 	{
 		return 0;
 	}
-	steg = fopen("sample.bmp", "rb+");
+	else if (opt==52)
+	{
+		printf("\nPlease Key In The Name Of The New File : ");
+		scanf("%[^\n]", filename);
+		getchar();
+		printf("\n");
+		goto start;
+	}
+	steg = fopen(filename, "rb+");
 	if (steg==NULL)
 	{
 		printf("The Data File Does Not Exist.\n\n");
