@@ -76,26 +76,69 @@ void write_pix(char ch)
 
 int main(int argc, char *argv[])
 {
-	char *filename;
+	char *filename, opt=0, wr_opt=0, exit=0;
 	if (argc==1)
 	{
 		filename="sample.bmp";
 	}
-	else if (argc==2)
-	{
-		filename=argv[1];
-	}
-	else
+	else if ((argc>5 && *argv[2]==50) || (argc>4 && *argv[2]!=50))
 	{
 		filename="sample.bmp";
 		printf("Too Many Arguments. Switching To Default File Name \"sample.bmp\"\n\n");
-	}	
-	char opt;
+		goto start;
+	}
+	if (argc==2 || argc==3 || argc==4 || argc==5)
+	{
+		filename=argv[1];		
+	}
+	if (argc==3 || argc==4 || argc==5)
+	{
+		opt=*argv[2];
+	}
+	if (argc==4 || argc==5)
+	{
+		if (opt==50)
+		{
+			wr_opt=*argv[3];
+			if (*argv[4]==48)
+			{
+				exit=*argv[4];
+			}
+			else
+			{
+				printf("Last Argument Is Invalid !\n\n");
+				exit=0;
+				opt=0;
+				wr_opt=0;
+			}
+		}
+		else if (opt==49 || opt==51)
+		{
+			if (*argv[3]==48)
+			{
+				exit=*argv[3];
+			}
+			else
+			{
+				printf("Last Argument Is Invalid !\n\n");
+				exit=0;
+				opt=0;
+				wr_opt=0;
+			}
+			
+		}
+	}
 	start:
-	printf("The Current Image File Is \"%s\"\n", filename);
-	printf("Enter 1 To Read The Message.\nEnter 2 To Write A Message.\nEnter 3 To Reset The Bitmap.\nEnter 0 To Exit.\n");
-	scanf("%c", &opt);
-	getchar();
+	if (opt!=48)
+	{
+		printf("The Current Image File Is \"%s\"\n", filename);
+	}
+	if (!opt)
+	{
+		printf("Enter 1 To Read The Message.\nEnter 2 To Write A Message.\nEnter 3 To Reset The Bitmap.\nEnter 0 To Exit.\n");
+		scanf("%c", &opt);
+		getchar();
+	}
 	if (opt==48)
 	{
 		return 0;
@@ -110,6 +153,7 @@ int main(int argc, char *argv[])
 	fseek(steg, 54, SEEK_SET);	
 	if (opt==49)
 	{
+		opt=(0|exit);
 		printf("\n--Read Mode--\n");
 		int i, j;
 		char ch;
@@ -137,17 +181,23 @@ int main(int argc, char *argv[])
 	}
 	else if (opt==50)
 	{
-		char wr_opt,ch;
+		opt=(0|exit);
+		char ch;
 		int i,j;
-		printf("\n--Write Mode--\nEnter 0 To OverWrite Message\nEnter 1 To Add Text To The Existing Message\n");
-		scanf("%c", &wr_opt);
-		getchar();
+		if (!wr_opt)
+		{		
+			printf("\n--Write Mode--\nEnter 0 To OverWrite Message\nEnter 1 To Add Text To The Existing Message\n");
+			scanf("%c", &wr_opt);
+			getchar();
+		}
 		if (wr_opt==48)
 		{
+			wr_opt=0;
 			write_pix(2);		
 		}
 		else if (wr_opt==49)
 		{
+			wr_opt=0;
 			if (read_char()==2)
 			{
 				for(i=0;i<bitmap.height;i++)
@@ -161,6 +211,7 @@ int main(int argc, char *argv[])
 					}
 					if (j<bitmap.width)
 					{
+						fseek(steg, -sizeof(pixel), SEEK_CUR);
 						break;
 					}
 					fseek(steg, bitmap.padding, SEEK_CUR);					
@@ -200,6 +251,7 @@ int main(int argc, char *argv[])
 	}
 	else if (opt==51)
 	{
+		opt=(0|exit);
 		printf("\n--Reset Mode--\nPlease Wait");
 		int i, j;
 		fseek(steg, sizeof(pixel), SEEK_CUR);
@@ -222,6 +274,9 @@ int main(int argc, char *argv[])
 	}
 	else 
 	{
+		opt=0;
+		wr_opt=0;
+		exit=0;
 		printf("Invalid Input !\n\n");	
 	}	
 	goto start;
