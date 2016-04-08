@@ -147,6 +147,9 @@ int main(int argc, char *argv[])
 	if (steg==NULL)
 	{
 		printf("The Data File Does Not Exist.\n\n");
+		exit=0;
+		opt=0;
+		wr_opt=0;
 		goto start;
 	}
 	intrpt_header(steg);
