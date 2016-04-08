@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 	}
 	else if (argc==2)
 	{
-		filename=argv[0];
+		filename=argv[1];
 	}
 	else
 	{
