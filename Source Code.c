@@ -81,13 +81,16 @@ int main(int argc, char *argv[])
 	{
 		filename="sample.bmp";
 	}
-	else if ((argc>5 && *argv[2]==50) || (argc>4 && *argv[2]!=50))
+	else if ((argc>6 && (*argv[2]==50 || *argv[2]==0)) || (argc>4 && (*argv[2]!=50 && *argv[2]!=0)))
 	{
-		filename="sample.bmp";
-		printf("Too Many Arguments. Switching To Default File Name \"sample.bmp\"\n\n");
+		printf("Too Many Arguments. Arguments Were Not Accepted. Switched To Defaults \"sample.bmp\"\n\n");
+		exit=0;
+		opt=0;
+		wr_opt=0;
+		filename="sample.bmp";		
 		goto start;
 	}
-	if (argc==2 || argc==3 || argc==4 || argc==5)
+	if (argc>=2)
 	{
 		if (*argv[1]==0)
 		{
@@ -98,48 +101,107 @@ int main(int argc, char *argv[])
 			filename=argv[1];
 		}		
 	}
-	if (argc==3 || argc==4 || argc==5)
+	if (argc>=3)
 	{
-		opt=*argv[2];
-	}
-	if (argc==4)
-	{
-		if (opt==50)
+		if ((*argv[2]==0)||(*argv[2]>=48 && *argv[2]<=51))
 		{
-			wr_opt=*argv[3];
+			opt=*argv[2];
 		}
-		else if (opt==49 || opt==51)
+		else
 		{
-			if (*argv[3]==48)
+			printf("Second Argument Is Invalid. Arguments Were Not Accepted. Switched To Defaults.\n\n");
+			exit=0;
+			opt=0;
+			wr_opt=0;
+			filename="sample.bmp";
+			goto start;
+		}
+	}
+	
+	if ((argc==6 || argc==5) && opt==0)
+	{
+		opt=50;
+	}
+		
+	if ((opt==49 || opt==51 || opt==0) && argc==4)
+	{
+		if (*argv[3]==48)
+		{
+			if (opt!=0)
 			{
 				exit=*argv[3];
 			}
 			else
 			{
-				printf("Last Argument Is Invalid !\n\n");
-				exit=0;
+				printf("Second Argument Is Invalid. Arguments Were Not Accepted. Switched To Defaults.\n\n");
 				opt=0;
 				wr_opt=0;
+				exit=0;
+				filename="sample.bmp";
+				goto start;
 			}
-			
-		}
-	}
-	if (argc==5)
-	{
-		wr_opt=*argv[3];
-		if (*argv[4]==48)
-		{
-			exit=*argv[4];
 		}
 		else
 		{
-			printf("Last Argument Is Invalid !\n\n");
-			exit=0;
+			if (opt==0)
+			{
+				printf("Third And Fourth Arguments Are");
+			}
+			else
+			{
+				printf("Fourth Argument Is ");
+			}
+			printf(" Invalid. Arguments Were Not Accepted. Switched To Defaults.\n\n");
 			opt=0;
 			wr_opt=0;
+			exit=0;
+			filename="sample.bmp";
+			goto start;
 		}
 	}
+	
+	if (opt==50)
+	{
+		if (argc==4 || argc==5 || argc==6)
+		{
+			if ((*argv[2]==0)||(*argv[2]>=48 && *argv[2]<=51))
+			{
+				wr_opt=*argv[3];
+			}
+			else
+			{
+				printf("Third Argument Is Invalid. Arguments Were Not Accepted. Switched To Defaults.\n\n");
+				opt=0;
+				wr_opt=0;
+				exit=0;
+				filename="sample.bmp";
+				goto start;
+			}
+		}
+		if (argc==5 || argc==6)
+		{
+			if (*argv[4]==48 || *argv[4]==0)
+			{
+				exit=*argv[4];
+			}
+			else
+			{
+				if (argc==6)
+				{
+					argc=0;
+				}
+				printf("Fifth Argument Is Invalid. Arguments Were Not Accepted. Switched To Defaults.\n\n");
+				opt=0;
+				wr_opt=0;
+				exit=0;
+				filename="sample.bmp";
+				goto start;
+			}
+		}
+	}		
+	
 	start:
+	fflush(stdin);
 	if (opt!=48)
 	{
 		printf("The Current Image File Is \"%s\"\n", filename);
@@ -150,6 +212,7 @@ int main(int argc, char *argv[])
 		scanf("%c", &opt);
 		getchar();
 	}
+	
 	if (opt==48)
 	{
 		return 0;
@@ -193,6 +256,7 @@ int main(int argc, char *argv[])
 			fseek(steg, bitmap.padding, SEEK_CUR);
 		}
 	}
+	
 	else if (opt==50)
 	{
 		opt=(0|exit);
@@ -245,21 +309,45 @@ int main(int argc, char *argv[])
 			goto start;
 		}
 		fseek(steg, sizeof(pixel), SEEK_CUR);
-		i=0;	
-		do
-		{
-			fseek(steg, -sizeof(pixel), SEEK_CUR);
-			ch=getchar();
-			write_pix(ch);
-			i+=1;
-			if (i==bitmap.width)
+		i=0;
+		if (argc==6)
+		{			
+			argc=0;
+			do
 			{
-				fseek(steg, bitmap.padding, SEEK_CUR);
-				i=0;
+				fseek(steg, -sizeof(pixel), SEEK_CUR);
+				write_pix(*(argv[5]+i));
+				i+=1;
+				if (i==bitmap.width)
+				{
+					fseek(steg, bitmap.padding, SEEK_CUR);
+					i=0;
+				}
+				fseek(steg, sizeof(pixel), SEEK_CUR);
 			}
+			while(*(argv[5]+i)!=0);
+			fseek(steg, -sizeof(pixel), SEEK_CUR);
+			write_pix(10);
 			fseek(steg, sizeof(pixel), SEEK_CUR);
 		}
-		while(ch!=10);
+		else
+		{
+			printf("Please Enter Your Message :\n");
+			do
+			{
+				fseek(steg, -sizeof(pixel), SEEK_CUR);
+				ch=getchar();
+				write_pix(ch);
+				i+=1;
+				if (i==bitmap.width)
+				{
+					fseek(steg, bitmap.padding, SEEK_CUR);
+					i=0;
+				}
+				fseek(steg, sizeof(pixel), SEEK_CUR);
+			}
+			while(ch!=10);	
+		}
 		printf("\n--Message Recorded--\n\n");
 		fclose(steg);		
 	}
